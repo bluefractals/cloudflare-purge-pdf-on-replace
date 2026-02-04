@@ -3,7 +3,7 @@
  * Plugin Name: Cloudflare Purge PDF on Replace
  * Description: Purges the exact PDF URL from Cloudflare when a PDF attachment is replaced/updated (useful for "Replace Media" workflows).
  * Version: 1.0.0
- * Author: Your Name
+ * Author: BlueFractals
  * License: GPL2+
  */
 
