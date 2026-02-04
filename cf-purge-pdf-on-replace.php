@@ -228,7 +228,7 @@ class CF_Purge_PDF_On_Replace {
     public static function field_api_token(): void {
         $s = self::get_settings();
         printf(
-            '<input type="password" name="%s[api_token]" value="%s" class="regular-text" autocomplete="new-password" /> <p class="description">Stored in the WP database. If you prefer, I can show a variant that reads from wp-config.php constants instead.</p>',
+            '<input type="password" name="%s[api_token]" value="%s" class="regular-text" autocomplete="new-password" /> <p class="description">Stored in the WP database.</p>',
             esc_attr(self::OPTION_KEY),
             esc_attr($s['api_token'])
         );
