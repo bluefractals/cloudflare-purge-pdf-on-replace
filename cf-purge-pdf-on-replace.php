@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Cloudflare Purge File on Replace
- * Description: Purges the exact file URL from Cloudflare when a file attachment is replaced/updated (useful for "Replace Media" workflows).
+ * Plugin Name: Cloudflare Purge PDF on Replace
+ * Description: Purges the exact PDF URL from Cloudflare when a PDF attachment is replaced/updated (useful for "Replace Media" workflows).
  * Version: 1.0.0
  * Author: BlueFractals
  * License: GPL2+
@@ -9,9 +9,9 @@
 
 if (!defined('ABSPATH')) { exit; }
 
-class CF_Purge_File_On_Replace {
-    const OPTION_KEY = 'cf_purge_file_settings';
-    const EMAIL_THROTTLE_TRANSIENT = 'cf_purge_file_last_email_ts';
+class CF_Purge_PDF_On_Replace {
+    const OPTION_KEY = 'cf_purge_pdf_settings';
+    const EMAIL_THROTTLE_TRANSIENT = 'cf_purge_pdf_last_email_ts';
 
     private static array $purged_this_request = [];
 
@@ -32,6 +32,7 @@ class CF_Purge_File_On_Replace {
             'notify_email' => get_option('admin_email'),
             'enable_email' => 1,
             'email_throttle_minutes' => 15,
+            'delete_settings_on_uninstall' => 0,
         ];
         $saved = get_option(self::OPTION_KEY, []);
         if (!is_array($saved)) $saved = [];
@@ -148,6 +149,16 @@ class CF_Purge_File_On_Replace {
         wp_mail($to, $subject, $message);
     }
 
+    public static function field_delete_settings_on_uninstall(): void {
+        $s = self::get_settings();
+        printf(
+            '<label><input type="checkbox" name="%s[delete_settings_on_uninstall]" value="1" %s /> Delete plugin settings (including API token) when the plugin is deleted</label>
+             <p class="description">This runs only when you click <strong>Delete</strong> in the Plugins screen (not when deactivating).</p>',
+            esc_attr(self::OPTION_KEY),
+            checked(1, (int) $s['delete_settings_on_uninstall'], false)
+        );
+    }
+
     // --------------------------
     // Admin settings page
     // --------------------------
@@ -166,7 +177,7 @@ class CF_Purge_File_On_Replace {
         register_setting(self::OPTION_KEY, self::OPTION_KEY, [__CLASS__, 'sanitize_settings']);
 
         add_settings_section(
-            'cf_purge_file_main',
+            'cf_purge_pdf_main',
             'Cloudflare settings',
             function () {
                 echo '<p>Set your Cloudflare Zone ID + API Token (Zone → Cache Purge → Purge, Zone → Read).</p>';
@@ -174,11 +185,12 @@ class CF_Purge_File_On_Replace {
             'cf-purge-file-on-replace'
         );
 
-        add_settings_field('zone_id', 'Zone ID', [__CLASS__, 'field_zone_id'], 'cf-purge-file-on-replace', 'cf_purge_file_main');
-        add_settings_field('api_token', 'API Token', [__CLASS__, 'field_api_token'], 'cf-purge-file-on-replace', 'cf_purge_file_main');
-        add_settings_field('notify_email', 'Notification email', [__CLASS__, 'field_notify_email'], 'cf-purge-file-on-replace', 'cf_purge_file_main');
-        add_settings_field('enable_email', 'Enable failure emails', [__CLASS__, 'field_enable_email'], 'cf-purge-file-on-replace', 'cf_purge_file_main');
-        add_settings_field('email_throttle_minutes', 'Email throttle (minutes)', [__CLASS__, 'field_throttle'], 'cf-purge-file-on-replace', 'cf_purge_file_main');
+        add_settings_field('zone_id', 'Zone ID', [__CLASS__, 'field_zone_id'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('api_token', 'API Token', [__CLASS__, 'field_api_token'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('notify_email', 'Notification email', [__CLASS__, 'field_notify_email'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('enable_email', 'Enable failure emails', [__CLASS__, 'field_enable_email'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('email_throttle_minutes', 'Email throttle (minutes)', [__CLASS__, 'field_throttle'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('delete_settings_on_uninstall', 'Delete settings on uninstall', [__CLASS__, 'field_delete_settings_on_uninstall'], 'cf-purge-pdf-on-replace', 'cf_purge_pdf_main');
     }
 
     public static function sanitize_settings($input): array {
@@ -190,6 +202,7 @@ class CF_Purge_File_On_Replace {
             $out['notify_email'] = sanitize_email($input['notify_email'] ?? get_option('admin_email'));
             $out['enable_email'] = !empty($input['enable_email']) ? 1 : 0;
             $out['email_throttle_minutes'] = max(1, (int) ($input['email_throttle_minutes'] ?? 15));
+            $out['delete_settings_on_uninstall'] = !empty($input['delete_settings_on_uninstall']) ? 1 : 0;
         }
 
         return $out;
@@ -262,4 +275,4 @@ class CF_Purge_File_On_Replace {
     }
 }
 
-CF_Purge_File_On_Replace::init();
+CF_Purge_PDF_On_Replace::init();
