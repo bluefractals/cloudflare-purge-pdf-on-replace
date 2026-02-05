@@ -143,7 +143,7 @@ class CF_Purge_PDF_On_Replace {
         $to = sanitize_email((string) $settings['notify_email']);
         if (!$to) $to = get_option('admin_email');
 
-        $subject = '[' . get_bloginfo('name') . '] Cloudflare file purge failed';
+        $subject = '[' . get_bloginfo('name') . '] Cloudflare PDF purge failed';
 
         // wp_mail returns bool, but we won't error-loop on failures
         wp_mail($to, $subject, $message);
@@ -165,10 +165,10 @@ class CF_Purge_PDF_On_Replace {
 
     public static function add_settings_page(): void {
         add_options_page(
-            'Cloudflare File Purge',
-            'Cloudflare File Purge',
+            'Cloudflare PDF Purge',
+            'Cloudflare PDF Purge',
             'manage_options',
-            'cf-purge-file-on-replace',
+            'cf-purge-pdf-on-replace',
             [__CLASS__, 'render_settings_page']
         );
     }
@@ -182,14 +182,14 @@ class CF_Purge_PDF_On_Replace {
             function () {
                 echo '<p>Set your Cloudflare Zone ID + API Token (Zone → Cache Purge → Purge, Zone → Read).</p>';
             },
-            'cf-purge-file-on-replace'
+            'cf-purge-pdf-on-replace'
         );
 
-        add_settings_field('zone_id', 'Zone ID', [__CLASS__, 'field_zone_id'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
-        add_settings_field('api_token', 'API Token', [__CLASS__, 'field_api_token'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
-        add_settings_field('notify_email', 'Notification email', [__CLASS__, 'field_notify_email'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
-        add_settings_field('enable_email', 'Enable failure emails', [__CLASS__, 'field_enable_email'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
-        add_settings_field('email_throttle_minutes', 'Email throttle (minutes)', [__CLASS__, 'field_throttle'], 'cf-purge-file-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('zone_id', 'Zone ID', [__CLASS__, 'field_zone_id'], 'cf-purge-pdf-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('api_token', 'API Token', [__CLASS__, 'field_api_token'], 'cf-purge-pdf-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('notify_email', 'Notification email', [__CLASS__, 'field_notify_email'], 'cf-purge-pdf-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('enable_email', 'Enable failure emails', [__CLASS__, 'field_enable_email'], 'cf-purge-pdf-on-replace', 'cf_purge_pdf_main');
+        add_settings_field('email_throttle_minutes', 'Email throttle (minutes)', [__CLASS__, 'field_throttle'], 'cf-purge-pdf-on-replace', 'cf_purge_pdf_main');
         add_settings_field('delete_settings_on_uninstall', 'Delete settings on uninstall', [__CLASS__, 'field_delete_settings_on_uninstall'], 'cf-purge-pdf-on-replace', 'cf_purge_pdf_main');
     }
 
@@ -212,17 +212,17 @@ class CF_Purge_PDF_On_Replace {
         if (!current_user_can('manage_options')) return;
 
         echo '<div class="wrap">';
-        echo '<h1>Cloudflare File Purge</h1>';
+        echo '<h1>Cloudflare PDF Purge</h1>';
         echo '<form method="post" action="options.php">';
         settings_fields(self::OPTION_KEY);
-        do_settings_sections('cf-purge-file-on-replace');
+        do_settings_sections('cf-purge-pdf-on-replace');
         submit_button('Save Settings');
         echo '</form>';
 
         echo '<hr />';
         echo '<p><strong>Notes:</strong></p>';
         echo '<ul style="list-style: disc; padding-left: 20px;">';
-        echo '<li>This plugin purges the specific file URL from Cloudflare when a file attachment is replaced/updated.</li>';
+        echo '<li>This plugin purges the specific PDF URL from Cloudflare when a PDF attachment is replaced/updated.</li>';
         echo '<li>You can deactivate it anytime from <em>Plugins</em>.</li>';
         echo '</ul>';
 
